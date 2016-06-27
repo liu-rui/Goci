@@ -47,3 +47,15 @@ func (server *Server) Stop() error {
 func NewServer(address string, processor thrift.TProcessor) *Server {
 	return &Server{address, processor, nil}
 }
+
+//ServerConfig RPC服务端配置
+type ServerConfig struct {
+	Address       string
+	ServiceCentre *ServiceCentre
+}
+
+//ServiceCentre 服务中心配置
+type ServiceCentre struct {
+	Server string
+	Name   string
+}
