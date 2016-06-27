@@ -12,21 +12,26 @@ var (
 
 //Server PRC服务端类型
 type Server struct {
-	address      string
-	processor    thrift.TProcessor
+	config       *ServerConfig
 	simpleServer *thrift.TSimpleServer
 }
 
 //Serve 启动
-func (server *Server) Serve() error {
+func (server *Server) Serve(processor thrift.TProcessor) error {
 	transportFactory := thrift.NewTTransportFactory()
 	protocolFactory := thrift.NewTCompactProtocolFactory()
-	serverTransport, err := thrift.NewTServerSocket(server.address)
+	serverTransport, err := thrift.NewTServerSocket(server.config.Address)
 
 	if err != nil {
 		return err
 	}
-	server.simpleServer = thrift.NewTSimpleServer4(server.processor, serverTransport, transportFactory, protocolFactory)
+	server.simpleServer = thrift.NewTSimpleServer4(processor, serverTransport, transportFactory, protocolFactory)
+
+	if server.config.ServiceCentre != nil {
+		serverPublisher := newServerPublisher(server.config.ServiceCentre.Servers, server.config.ServiceCentre.Name, server.config.Address)
+		serverPublisher.Register()
+		defer serverPublisher.Close()
+	}
 
 	if err := server.simpleServer.Serve(); err != nil {
 		return err
@@ -44,8 +49,13 @@ func (server *Server) Stop() error {
 }
 
 //NewServer 创建PRC服务端对象
-func NewServer(address string, processor thrift.TProcessor) *Server {
-	return &Server{address, processor, nil}
+func NewServer(address string) *Server {
+	return &Server{config: &ServerConfig{Address: address}}
+}
+
+//NewServerByConfig  通过配置创建PRC服务端对象
+func NewServerByConfig(conf *ServerConfig) *Server {
+	return &Server{config: conf}
 }
 
 //ServerConfig RPC服务端配置
@@ -56,6 +66,6 @@ type ServerConfig struct {
 
 //ServiceCentre 服务中心配置
 type ServiceCentre struct {
-	Server string
-	Name   string
+	Servers []string
+	Name    string
 }
