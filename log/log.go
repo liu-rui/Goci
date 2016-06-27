@@ -8,8 +8,28 @@ func init() {
 	log = newBeegoAdapter()
 }
 
+type Level int
+
+const (
+	LevelTrace Level = iota
+	LevelDebug
+	LevelInfo
+	LevelError
+	LevelFatal
+)
+
+type Adapter struct {
+	Config string
+}
+
+type LogConfig struct {
+	Level    Level
+	Adapters map[string]Adapter
+}
+
 //Log  日志接口
 type logger interface {
+	SetLog(*LogConfig) error
 	//Trace 跟踪
 	Trace(format string, args ...interface{})
 
@@ -27,8 +47,8 @@ type logger interface {
 }
 
 //SetLog 配置log
-func SetLog() {
-
+func SetLog(conf *LogConfig) error {
+	return log.SetLog(conf)
 }
 
 //Tracef 跟踪

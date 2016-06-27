@@ -6,6 +6,26 @@ type beegoAdapter struct {
 	beegoLog *logs.BeeLogger
 }
 
+func (log *beegoAdapter) SetLog(conf *LogConfig) error {
+	switch conf.Level {
+	case LevelTrace:
+		log.beegoLog.SetLevel(logs.LevelTrace)
+	case LevelDebug:
+		log.beegoLog.SetLevel(logs.LevelDebug)
+	case LevelInfo:
+		log.beegoLog.SetLevel(logs.LevelInfo)
+	case LevelFatal:
+		log.beegoLog.SetLevel(logs.LevelEmergency)
+	}
+
+	for k := range conf.Adapters {
+		if err := log.beegoLog.SetLogger(k, conf.Adapters[k].Config); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 //Trace 跟踪
 func (log *beegoAdapter) Trace(format string, args ...interface{}) {
 	log.beegoLog.Trace(format, args)
@@ -33,6 +53,5 @@ func (log *beegoAdapter) Fatal(format string, args ...interface{}) {
 
 func newBeegoAdapter() *beegoAdapter {
 	var ret = &beegoAdapter{beegoLog: logs.NewLogger(100)}
-
 	return ret
 }
