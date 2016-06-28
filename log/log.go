@@ -53,27 +53,27 @@ func SetLog(conf *LogConfig) error {
 
 //Tracef 跟踪
 func Tracef(format string, args ...interface{}) {
-	log.Trace(format, args)
+	log.Trace(format, args...)
 }
 
 //Debugf 调试
 func Debugf(format string, args ...interface{}) {
-	log.Debug(format, args)
+	log.Debug(format, args...)
 }
 
 //Infof 信息
 func Infof(format string, args ...interface{}) {
-	log.Info(format, args)
+	log.Info(format, args...)
 }
 
 //Errorf 错误
 func Errorf(format string, args ...interface{}) {
-	log.Error(format, args)
+	log.Error(format, args...)
 }
 
 //Fatalf 致命错误
 func Fatalf(format string, args ...interface{}) {
-	log.Fatal(format, args)
+	log.Fatal(format, args...)
 }
 
 //Trace 跟踪

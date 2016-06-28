@@ -1,4 +1,6 @@
-package rpc
+ package server
+ 
+ 
 
 import (
 	"errors"
@@ -9,6 +11,18 @@ import (
 var (
 	errorServerNoInit = errors.New("please execute Serve function  first")
 )
+
+//ServerConfig RPC服务端配置
+type ServerConfig struct {
+	Address       string
+	ServiceCentre *ServiceCentre
+}
+
+//ServiceCentre 服务中心配置
+type ServiceCentre struct {
+	Servers []string
+	Name    string
+}
 
 //Server PRC服务端类型
 type Server struct {
@@ -29,7 +43,9 @@ func (server *Server) Serve(processor thrift.TProcessor) error {
 
 	if server.config.ServiceCentre != nil {
 		serverPublisher := newServerPublisher(server.config.ServiceCentre.Servers, server.config.ServiceCentre.Name, server.config.Address)
-		serverPublisher.Register()
+		if err := serverPublisher.Run(); err != nil {
+			panic(err)
+		}
 		defer serverPublisher.Close()
 	}
 
@@ -56,16 +72,4 @@ func NewServer(address string) *Server {
 //NewServerByConfig  通过配置创建PRC服务端对象
 func NewServerByConfig(conf *ServerConfig) *Server {
 	return &Server{config: conf}
-}
-
-//ServerConfig RPC服务端配置
-type ServerConfig struct {
-	Address       string
-	ServiceCentre *ServiceCentre
-}
-
-//ServiceCentre 服务中心配置
-type ServiceCentre struct {
-	Servers []string
-	Name    string
 }
