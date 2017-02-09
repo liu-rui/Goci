@@ -1,6 +1,4 @@
- package server
- 
- 
+package server
 
 import (
 	"errors"
@@ -22,6 +20,7 @@ type ServerConfig struct {
 type ServiceCentre struct {
 	Servers []string
 	Name    string
+	Address string
 }
 
 //Server PRC服务端类型
@@ -42,7 +41,7 @@ func (server *Server) Serve(processor thrift.TProcessor) error {
 	server.simpleServer = thrift.NewTSimpleServer4(processor, serverTransport, transportFactory, protocolFactory)
 
 	if server.config.ServiceCentre != nil {
-		serverPublisher := newServerPublisher(server.config.ServiceCentre.Servers, server.config.ServiceCentre.Name, server.config.Address)
+		serverPublisher := newServerPublisher(server.config.ServiceCentre.Servers, server.config.ServiceCentre.Name, server.config.ServiceCentre.Address)
 		if err := serverPublisher.Run(); err != nil {
 			panic(err)
 		}
